@@ -21,3 +21,6 @@ Validated strict turns, matching and scoring, odd/even board construction, full-
 
 ## Room chat
 Authenticated room members can send plain-text messages while waiting, playing, or viewing results. Messages include the sender's name/avatar snapshot and server timestamp, are retained across rounds, and share the room's 24-hour expiry. The latest 100 messages are stored inside the versioned room state. The server enforces 300-character messages, per-player rate limits, duplicate suppression, and room membership. The existing polling loop synchronizes chat without exposing messages to other rooms.
+
+## Viewport layout
+Joined rooms fill the available viewport with independent board/chat scrolling. Desktop chat stays beside the board; narrow screens reserve a bottom chat area. Room configuration and results open in a dialog. The board fits the current row/column count, with an optional 110px minimum card zoom mode. Clicking a currently revealed card opens a larger image; concealment automatically closes it without pausing the turn. Verified at 1280×720 and 390×844 using a 6×7 board with eight players.
