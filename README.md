@@ -27,3 +27,5 @@ Joined rooms fill the available viewport with independent board/chat scrolling. 
 
 ### Card decks
 Room creation offers tabby and orange-cat decks (36 identities each). The server validates and stores `deckSet` in room JSON; all participants use the room theme through rounds. Legacy rooms default to tabby. Generated orange sheet is `public/orange-cats-v1.png`, 1254 × 1254, six-by-six tiles.
+
+Added the Abyssinian deck (36 generated portraits). The homepage now defaults to joining, with room code and name above the fold, a separate create flow, optional collapsed avatars, and entry before preview on mobile. Invitation links prefill the join code.
