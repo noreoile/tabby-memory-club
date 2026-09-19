@@ -1,3 +1,4 @@
+import {isDeckSet} from '@/lib/decks';
 import {roomDb} from '@/lib/room-db';
 import {type Room,type Player,settle,start,flip,view,sendChat} from '@/lib/game';
 export const dynamic='force-dynamic';
@@ -8,8 +9,9 @@ async function player(name:unknown,avatar:unknown,token:string):Promise<Player>{
 function code(){const a=new Uint8Array(6);crypto.getRandomValues(a);return Array.from(a,x=>'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'[x%32]).join('')}
 async function handle(request:Request,body:any){const db=roomDb();const now=Date.now();
  if(body.action==='create'){
+ const deckSet=body.deckSet??'tabby';if(!isDeckSet(deckSet))throw Error('請選擇狸花貓或橘貓牌組');
  const token=crypto.randomUUID()+crypto.randomUUID();const p=await player(body.name,body.avatar,token);
- for(let n=0;n<5;n++){const c=code();const r:Room={code:c,players:[p],host:p.id,rows:4,cols:4,deck:[],matched:[],flipped:[],turn:p.id,phase:'lobby',resolveAt:0,deadline:0,round:0,last:'等待朋友加入',actions:[]};const added=await db.prepare('INSERT OR IGNORE INTO rooms(code,state,version,expires_at) VALUES(?,?,0,?)').bind(c,JSON.stringify(r),now+86400000).run();if(added.meta.changes)return json({room:view(r,p.id,0,now),token})}throw Error('建立房間失敗，請再試一次')}
+ for(let n=0;n<5;n++){const c=code();const r:Room={deckSet,code:c,players:[p],host:p.id,rows:4,cols:4,deck:[],matched:[],flipped:[],turn:p.id,phase:'lobby',resolveAt:0,deadline:0,round:0,last:'等待朋友加入',actions:[]};const added=await db.prepare('INSERT OR IGNORE INTO rooms(code,state,version,expires_at) VALUES(?,?,0,?)').bind(c,JSON.stringify(r),now+86400000).run();if(added.meta.changes)return json({room:view(r,p.id,0,now),token})}throw Error('建立房間失敗，請再試一次')}
  const c=String(body.code||'').trim().toUpperCase();if(!/^[A-Z2-9]{6}$/.test(c))return json({error:'請輸入正確的 6 位房間代碼'},400);
  const supplied=request.headers.get('authorization')?.replace(/^Bearer /,'');const secret=supplied?await hash(supplied):'';
  const joining=body.action==='join';const newToken=joining&&!supplied?crypto.randomUUID()+crypto.randomUUID():null;const candidate=joining?await player(body.name,body.avatar,supplied||newToken!):null;
