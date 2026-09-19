@@ -18,3 +18,6 @@ Production migrations are shipped under `dist/.openai/drizzle`. The hosting conf
 
 ## Verification
 Validated strict turns, matching and scoring, odd/even board construction, full-round completion and replay, concurrent 8-player joins and capacity limits, session protection, hidden card projection, and idempotent actions. WebMCP read/flip tools were exercised in the browser, including invalid-input rejection.
+
+## Room chat
+Authenticated room members can send plain-text messages while waiting, playing, or viewing results. Messages include the sender's name/avatar snapshot and server timestamp, are retained across rounds, and share the room's 24-hour expiry. The latest 100 messages are stored inside the versioned room state. The server enforces 300-character messages, per-player rate limits, duplicate suppression, and room membership. The existing polling loop synchronizes chat without exposing messages to other rooms.

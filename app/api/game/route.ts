@@ -1,5 +1,5 @@
 import {roomDb} from '@/lib/room-db';
-import {type Room,type Player,settle,start,flip,view} from '@/lib/game';
+import {type Room,type Player,settle,start,flip,view,sendChat} from '@/lib/game';
 export const dynamic='force-dynamic';
 const json=(data:unknown,status=200)=>Response.json(data,{status,headers:{'Cache-Control':'no-store'}});
 async function hash(s:string){return Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s)))).map(v=>v.toString(16).padStart(2,'0')).join('')}
@@ -25,6 +25,7 @@ async function handle(request:Request,body:any){const db=roomDb();const now=Date
  if(!key||!r.actions.includes(key)){
  if(body.action==='start'){if(r.host!==p.id)throw Error('只有房主可以開始');if(r.phase==='playing')throw Error('請先完成這局');start(r,body.rows,body.cols,now)}
  else if(body.action==='flip'){if(body.deadline!==r.deadline||body.round!==r.round)throw Error('輪次已更新，請重新選牌');flip(r,p.id,body.index,now)}
+ else if(body.action==='chat')sendChat(r,p,body.text,body.messageId,now);
  else if(body.action==='leave'){p.left=true;settle(r,now)}
  else if(!['join','read'].includes(body.action))throw Error('不支援的操作');
  if(key){r.actions.push(key);r.actions=r.actions.slice(-80)}}
