@@ -7,13 +7,18 @@ export function next(r:Room,now:number){const online=live(r,now);const current=r
 export function settle(r:Room,now:number){
  const online=live(r,now);if(!online.some(p=>p.id===r.host)&&online.length)r.host=online[0].id;
  if(r.phase!=='playing')return;
- if(r.resolveAt&&now>=r.resolveAt){r.flipped=[];r.resolveAt=0;if(r.matched.length===r.deck.filter(v=>v>=0).length){r.phase='finished';r.last='全部配對完成！';return}next(r,now)}
+ if(r.resolveAt&&now>=r.resolveAt){
+  const earnedExtraTurn=r.flipped.length===2&&r.flipped.every(i=>r.matched.includes(i));
+  r.flipped=[];r.resolveAt=0;
+  if(r.matched.length===r.deck.filter(v=>v>=0).length){r.phase='finished';r.last='全部配對完成！';return}
+  if(earnedExtraTurn&&online.some(p=>p.id===r.turn)){r.deadline=now+35000;r.last='配對成功，繼續翻牌！'}else next(r,now);
+ }
  if(!r.resolveAt&&(now>=r.deadline||!online.some(p=>p.id===r.turn))){r.flipped=[];next(r,now);r.last='已換下一位玩家'}
 }
 function random(n:number){const a=new Uint32Array(1);const limit=Math.floor(4294967296/n)*n;do{crypto.getRandomValues(a)}while(a[0]>=limit);return a[0]%n}
 export function shuffle<T>(a:T[]){for(let i=a.length-1;i>0;i--){const j=random(i+1);[a[i],a[j]]=[a[j],a[i]]}return a}
 export function start(r:Room,rows:number,cols:number,now:number){if(!Number.isInteger(rows)||!Number.isInteger(cols)||rows<2||rows>8||cols<2||cols>8)throw Error('行列數需為 2–8');const online=live(r,now);if(online.length<2)throw Error('至少需要 2 位在線玩家');const count=rows*cols;const cats=shuffle(Array.from({length:36},(_,i)=>i)).slice(0,Math.floor(count/2));r.deck=shuffle(cats.flatMap(x=>[x,x]));if(count%2)r.deck.splice(Math.floor(count/2),0,-1);r.rows=rows;r.cols=cols;r.matched=[];r.flipped=[];r.players=r.players.filter(p=>online.some(o=>o.id===p.id));r.players.forEach(p=>p.score=0);r.turn=r.players[0].id;r.phase='playing';r.resolveAt=0;r.deadline=now+35000;r.round++;r.last='新的一局，開始！'}
-export function flip(r:Room,pid:string,index:number,now:number){if(r.phase!=='playing')throw Error('這局還沒開始');if(live(r,now).length<2)throw Error('等待另一位玩家重新連線');if(r.turn!==pid)throw Error('還沒輪到你');if(r.resolveAt)throw Error('請等這回合翻牌結束');if(!Number.isInteger(index)||index<0||index>=r.deck.length||r.deck[index]<0||r.flipped.includes(index)||r.matched.includes(index))throw Error('這張牌不能翻');r.flipped.push(index);if(r.flipped.length===2){const[a,b]=r.flipped;if(r.deck[a]===r.deck[b]){r.matched.push(a,b);r.players.find(p=>p.id===pid)!.score++;r.last='找到同一隻貓！＋1 分'}else r.last='差一點！再記住牠們的位置';r.resolveAt=now+1700}}
+export function flip(r:Room,pid:string,index:number,now:number){if(r.phase!=='playing')throw Error('這局還沒開始');if(live(r,now).length<2)throw Error('等待另一位玩家重新連線');if(r.turn!==pid)throw Error('還沒輪到你');if(r.resolveAt)throw Error('請等這回合翻牌結束');if(!Number.isInteger(index)||index<0||index>=r.deck.length||r.deck[index]<0||r.flipped.includes(index)||r.matched.includes(index))throw Error('這張牌不能翻');r.flipped.push(index);if(r.flipped.length===2){const[a,b]=r.flipped;if(r.deck[a]===r.deck[b]){r.matched.push(a,b);r.players.find(p=>p.id===pid)!.score++;r.last='找到同一隻貓！＋1 分，再翻一次'}else r.last='差一點！再記住牠們的位置';r.resolveAt=now+1700}}
 export function view(r:Room,pid:string,version:number,now:number){return {...r,deckSet:resolveDeckSet(r.deckSet),players:r.players.filter(p=>!p.left||r.phase!=='lobby').map(({secret,...p})=>({...p,online:!p.left&&now-p.seen<45000})),deck:r.deck.map((v,i)=>v===-1?-1:r.flipped.includes(i)||r.matched.includes(i)?v:null),actions:undefined,you:pid,version,serverTime:now}}
 
 export function sendChat(r:Room,p:Player,text:unknown,id:unknown,now:number){

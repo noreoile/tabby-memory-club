@@ -3,7 +3,7 @@
 2–8 player online memory game with generated photorealistic tabby cat cards.
 
 ## Play
-Create a room with a name and avatar, share its six-character code or invitation link, and let the host select a board size. Each turn reveals two cards. A matching pair earns one point; every turn moves to the next online player. Odd boards include one unscored rest tile. Games finish with a leaderboard and support replay.
+Create a room with a name and avatar, share its six-character code or invitation link, and let the host select a board size. Each turn reveals two cards. A matching pair earns one point and another turn; mismatches and timeouts move to the next online player. Odd boards include one unscored rest tile. Games finish with a leaderboard and support replay.
 
 ## Runtime
 React + Vinext on Cloudflare Workers. D1 persists room state with optimistic version checks, opaque per-player session tokens, and server-only hidden card identities. Clients poll for updates. Turns last 35 seconds; disconnected seats are skipped after 45 seconds. Rooms expire after 24 hours. Browser storage stores only the room credential and preferred display name.
@@ -29,3 +29,5 @@ Joined rooms fill the available viewport with independent board/chat scrolling. 
 Room creation offers tabby and orange-cat decks (36 identities each). The server validates and stores `deckSet` in room JSON; all participants use the room theme through rounds. Legacy rooms default to tabby. Generated orange sheet is `public/orange-cats-v1.png`, 1254 × 1254, six-by-six tiles.
 
 Added the Abyssinian deck (36 generated portraits). The homepage now defaults to joining, with room code and name above the fold, a separate create flow, optional collapsed avatars, and entry before preview on mobile. Invitation links prefill the join code.
+
+Matching earns one point and another turn, with a fresh 35-second timer after reveal resolution. Mismatches/timeouts pass play; disconnected players are skipped. Abyssinian v2 uses varied coats, poses, and expressions for easier recognition.
