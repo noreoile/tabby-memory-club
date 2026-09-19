@@ -14,7 +14,7 @@ Use Node 22.13 or newer and npm. Run `npm run install:ci`, `npm run db:generate`
 Production migrations are shipped under `dist/.openai/drizzle`. The hosting configuration declares D1 binding `DB`.
 
 ## Assets
-`public/cats.png` is a 6×6 sprite sheet of 36 generated tabby portraits. Original built-in imagegen output: 1254×1254 pixels (209×209 per portrait). Intended card display size is under 110px on desktop. Card image identities are not included in API responses until revealed or matched.
+`public/cats-v2.png` is a 6×6 sprite sheet of 36 generated tabby portraits. Original built-in imagegen output: 1254×1254 pixels (209×209 per portrait). Intended card display size is under 110px on desktop. Card image identities are not included in API responses until revealed or matched.
 
 ## Verification
 Validated strict turns, matching and scoring, odd/even board construction, full-round completion and replay, concurrent 8-player joins and capacity limits, session protection, hidden card projection, and idempotent actions. WebMCP read/flip tools were exercised in the browser, including invalid-input rejection.
