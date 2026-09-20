@@ -1,8 +1,8 @@
 import {type DeckSet,resolveDeckSet,isDeckSet} from './decks';
-export const REACTION_EMOJIS=['❤️','😮','😹','🎉','👏','🙀'] as const;
+export const REACTIONS=[{id:'laugh',label:'笑死',image:'/reactions/laugh.png'}] as const;
 export type Player={id:string;secret:string;name:string;avatar:number;score:number;seen:number;left:boolean;spectator?:boolean};
 export type ChatMessage={id:string;playerId:string;name:string;avatar:number;text:string;sentAt:number};
-export type Reaction={id:string;playerId:string;name:string;emoji:string;sentAt:number};
+export type Reaction={id:string;playerId:string;name:string;kind:string;sentAt:number};
 export type Room={nextSetup?:{deckSet:DeckSet;rows:number;cols:number};deckSet?:DeckSet;messages?:ChatMessage[];reactions?:Reaction[];code:string;players:Player[];host:string;rows:number;cols:number;deck:number[];matched:number[];flipped:number[];turn:string;phase:'lobby'|'playing'|'finished';resolveAt:number;deadline:number;round:number;last:string;actions:string[]};
 export function configure(r:Room,pid:string,deckSet:unknown,rows:unknown,cols:unknown){if(r.host!==pid)throw Error('只有房主可以更換牌組與牌數');if(r.phase==='playing')throw Error('請等這局結束再更換');if(!isDeckSet(deckSet))throw Error('請選擇有效的牌組');if(typeof rows!=='number'||typeof cols!=='number'||!Number.isInteger(rows)||!Number.isInteger(cols)||rows<2||rows>8||cols<2||cols>8)throw Error('行列數需為 2–8');r.nextSetup={deckSet,rows,cols}}
 export function present(r:Room,now:number){return r.players.filter(p=>!p.left&&now-p.seen<45000)}
@@ -37,13 +37,13 @@ export function sendChat(r:Room,p:Player,text:unknown,id:unknown,now:number){
  r.messages=messages.slice(-100);
 }
 
-export function sendReaction(r:Room,p:Player,emoji:unknown,id:unknown,now:number){
- if(typeof emoji!=='string'||!(REACTION_EMOJIS as readonly string[]).includes(emoji))throw Error('不支援這個表情');
+export function sendReaction(r:Room,p:Player,kind:unknown,id:unknown,now:number){
+ if(typeof kind!=='string'||!REACTIONS.some(reaction=>reaction.id===kind))throw Error('不支援這個反應');
  if(typeof id!=='string'||!/^[a-zA-Z0-9-]{1,64}$/.test(id))throw Error('表情識別碼無效');
  const reactions=r.reactions??=[];const reactionId=p.id+':'+id;
  if(reactions.some(reaction=>reaction.id===reactionId))return;
  const previous=[...reactions].reverse().find(reaction=>reaction.playerId===p.id);
  if(previous&&now-previous.sentAt<700)throw Error('表情傳送太快，請稍等一下');
- reactions.push({id:reactionId,playerId:p.id,name:p.name,emoji,sentAt:now});
+ reactions.push({id:reactionId,playerId:p.id,name:p.name,kind,sentAt:now});
  r.reactions=reactions.filter(reaction=>now-reaction.sentAt<8000).slice(-24);
 }

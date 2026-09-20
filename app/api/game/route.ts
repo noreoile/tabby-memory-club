@@ -31,7 +31,7 @@ async function handle(request:Request,body:any){const db=roomDb();const now=Date
  else if(body.action==='avatar'){if(!validAvatar(body.avatar))throw Error('頭像無效');p.avatar=body.avatar}
  else if(body.action==='flip'){if(body.deadline!==r.deadline||body.round!==r.round)throw Error('輪次已更新，請重新選牌');flip(r,p.id,body.index,now)}
  else if(body.action==='chat')sendChat(r,p,body.text,body.messageId,now);
- else if(body.action==='reaction')sendReaction(r,p,body.emoji,body.reactionId,now);
+ else if(body.action==='reaction')sendReaction(r,p,body.reaction,body.reactionId,now);
  else if(body.action==='leave'){p.left=true;settle(r,now)}
  else if(!['join','read'].includes(body.action))throw Error('不支援的操作');
  if(key){r.actions.push(key);r.actions=r.actions.slice(-80)}}

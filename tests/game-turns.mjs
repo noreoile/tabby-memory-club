@@ -17,5 +17,5 @@ r=room();flip(r,'p0',0,now);settle(r,now+35000);assert.equal(r.turn,'p1');assert
 r=room();pair(r,0,1,now+34900);settle(r,now+36600);assert.equal(r.turn,'p0');assert.equal(r.deadline,now+71600);
 r=room();r.players[1].left=true;pair(r,0,2);settle(r,now+1700);assert.equal(r.turn,'p2');
 r=room();const watcher={id:'watcher',name:'Watcher',secret:'secret',avatar:4,score:0,seen:now,left:false,spectator:true};r.players.push(watcher);assert.throws(()=>flip(r,'watcher',0,now),/還沒輪到你/);r.turn='p2';pair(r,0,2);settle(r,now+1700);assert.equal(r.turn,'p0');start(r,2,2,now+1800);assert.equal(r.players.find(p=>p.id==='watcher').spectator,false);
-r=room();sendReaction(r,r.players[0],'🎉','reaction-1',now);assert.equal(r.reactions.at(-1).emoji,'🎉');assert.throws(()=>sendReaction(r,r.players[0],'nope','reaction-2',now+800),/不支援/);assert.throws(()=>sendReaction(r,r.players[0],'👏','reaction-3',now+500),/太快/);settle(r,now+9000);assert.deepEqual(r.reactions,[]);
+r=room();sendReaction(r,r.players[0],'laugh','reaction-1',now);assert.equal(r.reactions.at(-1).kind,'laugh');assert.throws(()=>sendReaction(r,r.players[0],'nope','reaction-2',now+800),/不支援/);assert.throws(()=>sendReaction(r,r.players[0],'laugh','reaction-3',now+500),/太快/);settle(r,now+9000);assert.deepEqual(r.reactions,[]);
 console.log('PASS turns, privacy, spectator promotion, reaction validation and expiry');
