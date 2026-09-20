@@ -4,7 +4,7 @@ import "./room-updates.css";
 
 export const metadata: Metadata = {
   title: "狸花俱樂部｜多人記憶配對",
-  description: "邀請朋友加入 2–8 人動物記憶配對，挑戰貓咪、水獺與海獺牌組。",
+  description: "邀請朋友加入 2–8 人記憶配對，從簡單到難，挑戰四副寫實貓咪牌組。",
   other: {
     "codex-preview": "development",
   },
