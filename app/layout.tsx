@@ -3,7 +3,7 @@ import "./globals.css";
 import "./room-updates.css";
 
 export const metadata: Metadata = {
-  title: "狸花俱樂部｜多人記憶配對",
+  title: "貓咪記憶俱樂部｜多人記憶配對",
   description: "邀請朋友加入 2–8 人記憶配對，從簡單到難，挑戰四副寫實貓咪牌組。",
   other: {
     "codex-preview": "development",

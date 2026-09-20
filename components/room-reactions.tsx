@@ -11,9 +11,9 @@ export function RoomReactions({disabled,onReact}:{disabled:boolean;onReact:(reac
   if(clearTimer.current)clearTimeout(clearTimer.current);
   clearTimer.current=setTimeout(()=>setFeedback(null),1600);
  }
- return <div className="reaction-controls" aria-label="迷因反應">
-  <span>迷因</span>
-  {REACTIONS.map(reaction=><button type="button" className={'meme-reaction-button '+(feedback?.reaction===reaction.id?'reaction-selected':'')} key={reaction.id} disabled={disabled} aria-label={`傳送「${reaction.label}」迷因`} onClick={()=>{void react(reaction.id)}}><img src={reaction.image} alt=""/><b>{reaction.label}</b></button>)}
-  {feedback?<span key={feedback.key} className={'reaction-feedback '+(feedback.ok?'sent':'failed')} role="status">{feedback.ok?'迷因已送出':'未送出'}</span>:null}
+ return <div className="reaction-controls" aria-label="圖片表情">
+  <span>表情</span>
+  {REACTIONS.map((reaction,index)=><button type="button" className={'meme-reaction-button '+(feedback?.reaction===reaction.id?'reaction-selected':'')} key={reaction.id} disabled={disabled} aria-label={`傳送第 ${index+1} 張表情圖片`} onClick={()=>{void react(reaction.id)}}><img src={reaction.image} alt=""/></button>)}
+  {feedback?<span key={feedback.key} className={'reaction-feedback '+(feedback.ok?'sent':'failed')} role="status">{feedback.ok?'表情已送出':'未送出'}</span>:null}
  </div>
 }

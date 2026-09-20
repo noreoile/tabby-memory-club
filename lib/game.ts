@@ -1,5 +1,5 @@
 import {type DeckSet,resolveDeckSet,isDeckSet} from './decks';
-export const REACTIONS=[{id:'laugh',label:'笑死',image:'/reactions/laugh.png'}] as const;
+export const REACTIONS=Array.from({length:7},(_,index)=>({id:`reaction-${index+1}`,image:`/reactions/reaction-${index+1}.png`})) as readonly {id:string;image:string}[];
 export type Player={id:string;secret:string;name:string;avatar:number;score:number;seen:number;left:boolean;spectator?:boolean};
 export type ChatMessage={id:string;playerId:string;name:string;avatar:number;text:string;sentAt:number};
 export type Reaction={id:string;playerId:string;name:string;kind:string;sentAt:number};
