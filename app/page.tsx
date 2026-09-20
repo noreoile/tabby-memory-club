@@ -4,14 +4,14 @@ import {Dialog,DialogContent,DialogTitle,DialogDescription,DialogTrigger} from '
 import {AvatarPicker,AvatarImage} from '@/components/avatar-picker';
 import {RoomSetup,type Setup} from '@/components/room-setup';
 import {RoomChat} from '@/components/room-chat';
-import {DECKS,type DeckSet,resolveDeckSet} from '@/lib/decks';
+import {DECKS,type DeckSet,resolveDeckSet,cardPhotoStyle} from '@/lib/decks';
 import type {ChatMessage} from '@/lib/game';
 import {PawPrint,ArrowUpRight,Users,Layers,Copy,Check,Trophy,RotateCcw} from 'lucide-react';
 import {Select,SelectContent,SelectItem,SelectTrigger,SelectValue} from '@/components/ui/select';
 import {RadioGroup,RadioGroupItem} from '@/components/ui/radio-group';
 type Player={id:string;name:string;avatar:number;score:number;online:boolean;left:boolean};
 type Room={nextSetup?:Setup;deckSet?:DeckSet;messages?:ChatMessage[];code:string;you:string;players:Player[];host:string;rows:number;cols:number;deck:(number|null)[];matched:number[];flipped:number[];turn:string;phase:'lobby'|'playing'|'finished';resolveAt:number;deadline:number;round:number;last:string;version:number;serverTime:number};
-function Cat({id,deckSet='tabby'}:{id:number;deckSet?:DeckSet}){return <div className="cat" role="img" aria-label={DECKS[deckSet].name+'照片'} style={{backgroundImage:`url(${DECKS[deckSet].image})`,backgroundPosition:`${id%6*20}% ${Math.floor(id/6)*20}%`}}/>}
+function Cat({id,deckSet='tabby'}:{id:number;deckSet?:DeckSet}){return <div className="cat" role="img" aria-label={DECKS[deckSet].name+'照片'} style={cardPhotoStyle(deckSet,id)}/>}
 export default function Home(){
  const[room,setRoom]=useState<Room|null>(null),[name,setName]=useState(''),[code,setCode]=useState(''),[avatar,setAvatar]=useState('0'),[rows,setRows]=useState('4'),[cols,setCols]=useState('4'),[error,setError]=useState(''),[busy,setBusy]=useState(false),[copied,setCopied]=useState(false),[connected,setConnected]=useState(true),[clock,setClock]=useState(Date.now());
  const[entryMode,setEntryMode]=useState<'join'|'create'>('join');

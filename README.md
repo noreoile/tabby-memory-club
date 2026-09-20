@@ -36,4 +36,4 @@ Hosts can configure the next round in the same room from the main board surface.
 
 Run `node tests/game-turns.mjs` for turn logic. With the local server running, `node tests/room-config.integration.mjs` checks same-room deck changes, permissions, chat preservation, completed-round state and avatar validation.
 
-The former otter selection is replaced by a hard black-and-white tuxedo cat deck (`tuxedo-cats-v1.png`). The persisted `otters` identifier remains for existing-room compatibility, but all displayed names and assets use black-and-white cats. Both deck selectors use the catalog order: Abyssinian (easy), tabby (medium), orange (hard), black-and-white (hard).
+The former otter selection is now the black-and-white cat deck. The persisted `otters` identifier remains for existing-room compatibility. Its current asset, `tuxedo-cats-v2.png`, follows the user's coat-pattern reference: black face and nose, white chest bib, varied ages. Its difficulty is medium. Both selectors follow catalog order: Abyssinian (easy), tabby (medium), black-and-white (medium), orange (hard).
