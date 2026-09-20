@@ -4,7 +4,7 @@ import ts from 'typescript';
 const moduleUrl=source=>'data:text/javascript;base64,'+Buffer.from(ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.ESNext,target:ts.ScriptTarget.ES2022}}).outputText).toString('base64');
 const decks=moduleUrl(await readFile(new URL('../lib/decks.ts',import.meta.url),'utf8'));
 const gameSource=(await readFile(new URL('../lib/game.ts',import.meta.url),'utf8')).replace("'./decks'",JSON.stringify(decks));
-const {flip,settle,view}=await import(moduleUrl(gameSource));
+const {flip,settle,view,start,sendReaction}=await import(moduleUrl(gameSource));
 const now=100000;
 function room(){return {code:'ABCDEF',players:[0,1,2].map(i=>({id:'p'+i,name:'Player '+i,secret:'secret',avatar:i,score:0,seen:now,left:false})),host:'p0',rows:2,cols:3,deck:[0,0,1,1,2,2],matched:[],flipped:[],turn:'p0',phase:'playing',resolveAt:0,deadline:now+35000,round:1,last:'',actions:[]}}
 function pair(r,a,b,t=now){flip(r,r.turn,a,t);flip(r,r.turn,b,t)}
@@ -16,4 +16,6 @@ r=room();pair(r,0,1);r.players[1].seen=now+46000;settle(r,now+46000);assert.notE
 r=room();flip(r,'p0',0,now);settle(r,now+35000);assert.equal(r.turn,'p1');assert.deepEqual(r.flipped,[]);
 r=room();pair(r,0,1,now+34900);settle(r,now+36600);assert.equal(r.turn,'p0');assert.equal(r.deadline,now+71600);
 r=room();r.players[1].left=true;pair(r,0,2);settle(r,now+1700);assert.equal(r.turn,'p2');
-console.log('PASS match streak, fresh timer, reveal lock, privacy, final scoring, mismatch, offline skip, timeout, near-deadline match');
+r=room();const watcher={id:'watcher',name:'Watcher',secret:'secret',avatar:4,score:0,seen:now,left:false,spectator:true};r.players.push(watcher);assert.throws(()=>flip(r,'watcher',0,now),/還沒輪到你/);r.turn='p2';pair(r,0,2);settle(r,now+1700);assert.equal(r.turn,'p0');start(r,2,2,now+1800);assert.equal(r.players.find(p=>p.id==='watcher').spectator,false);
+r=room();sendReaction(r,r.players[0],'🎉','reaction-1',now);assert.equal(r.reactions.at(-1).emoji,'🎉');assert.throws(()=>sendReaction(r,r.players[0],'nope','reaction-2',now+800),/不支援/);assert.throws(()=>sendReaction(r,r.players[0],'👏','reaction-3',now+500),/太快/);settle(r,now+9000);assert.deepEqual(r.reactions,[]);
+console.log('PASS turns, privacy, spectator promotion, reaction validation and expiry');

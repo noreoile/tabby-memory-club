@@ -1,7 +1,7 @@
 import {validAvatar} from '@/lib/avatars';
 import {isDeckSet} from '@/lib/decks';
 import {roomDb} from '@/lib/room-db';
-import {type Room,type Player,settle,start,flip,view,sendChat,configure} from '@/lib/game';
+import {type Room,type Player,settle,start,flip,view,sendChat,sendReaction,configure} from '@/lib/game';
 export const dynamic='force-dynamic';
 const json=(data:unknown,status=200)=>Response.json(data,{status,headers:{'Cache-Control':'no-store'}});
 async function hash(s:string){return Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s)))).map(v=>v.toString(16).padStart(2,'0')).join('')}
@@ -19,7 +19,7 @@ async function handle(request:Request,body:any){const db=roomDb();const now=Date
  for(let attempt=0;attempt<10;attempt++){
  const row=await db.prepare('SELECT state,version,expires_at FROM rooms WHERE code=?').bind(c).first<{state:string;version:number;expires_at:number}>();if(!row||row.expires_at<now)return json({error:'找不到房間，或房間已超過 24 小時',expired:true},404);
  const r:Room=JSON.parse(row.state);const before=JSON.stringify(r);let p=r.players.find(p=>p.secret===secret);
- if(joining){if(p){p.left=false;p.seen=now}else{if(r.phase==='playing')throw Error('遊戲已開始，請下一局再加入');r.players=r.players.filter(p=>!p.left&&now-p.seen<45000);if(r.players.length>=8)throw Error('房間已滿，最多 8 人');p=candidate!;r.players.push(p)}}
+ if(joining){if(p){p.left=false;p.seen=now}else{r.players=r.players.filter(p=>!p.left&&now-p.seen<45000);if(r.players.length>=8)throw Error('房間已滿，最多 8 人');p=candidate!;p.spectator=r.phase!=='lobby';r.players.push(p)}}
  if(!p)return json({error:'請先加入這個房間',expired:true},401);
  if(body.action!=='leave'){if(p.left)return json({error:'你已離開房間，請重新加入',expired:true},401);if(now-p.seen>8000)p.seen=now}
  settle(r,now);
@@ -31,6 +31,7 @@ async function handle(request:Request,body:any){const db=roomDb();const now=Date
  else if(body.action==='avatar'){if(!validAvatar(body.avatar))throw Error('頭像無效');p.avatar=body.avatar}
  else if(body.action==='flip'){if(body.deadline!==r.deadline||body.round!==r.round)throw Error('輪次已更新，請重新選牌');flip(r,p.id,body.index,now)}
  else if(body.action==='chat')sendChat(r,p,body.text,body.messageId,now);
+ else if(body.action==='reaction')sendReaction(r,p,body.emoji,body.reactionId,now);
  else if(body.action==='leave'){p.left=true;settle(r,now)}
  else if(!['join','read'].includes(body.action))throw Error('不支援的操作');
  if(key){r.actions.push(key);r.actions=r.actions.slice(-80)}}
