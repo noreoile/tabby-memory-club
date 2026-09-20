@@ -31,3 +31,7 @@ Room creation offers tabby and orange-cat decks (36 identities each). The server
 Added the Abyssinian deck (36 generated portraits). The homepage now defaults to joining, with room code and name above the fold, a separate create flow, optional collapsed avatars, and entry before preview on mobile. Invitation links prefill the join code.
 
 Matching earns one point and another turn, with a fresh 35-second timer after reveal resolution. Mismatches/timeouts pass play; disconnected players are skipped. Abyssinian v2 uses varied coats, poses, and expressions for easier recognition.
+
+Hosts can configure the next round in the same room from the main board surface. `nextSetup` stores the next deck and grid separately, so completed cards and scores retain their original meaning until the next round begins. Configuration is host-only and blocked during play. Players and chat remain across rounds. A visible start button sits above the selectors. Difficulty labels: Abyssinian easy, tabby medium, orange hard, mixed river/sea otters medium. The new otter sheet contains 36 photographs, 18 of each kind. Avatars now offer 36 choices across three cat decks, with larger picker/preview/player portraits; original avatar IDs 0–7 still point to the same images.
+
+Run `node tests/game-turns.mjs` for turn logic. With the local server running, `node tests/room-config.integration.mjs` checks same-room deck changes, permissions, chat preservation, completed-round state and avatar validation.

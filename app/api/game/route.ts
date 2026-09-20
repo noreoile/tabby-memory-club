@@ -1,11 +1,12 @@
+import {validAvatar} from '@/lib/avatars';
 import {isDeckSet} from '@/lib/decks';
 import {roomDb} from '@/lib/room-db';
-import {type Room,type Player,settle,start,flip,view,sendChat} from '@/lib/game';
+import {type Room,type Player,settle,start,flip,view,sendChat,configure} from '@/lib/game';
 export const dynamic='force-dynamic';
 const json=(data:unknown,status=200)=>Response.json(data,{status,headers:{'Cache-Control':'no-store'}});
 async function hash(s:string){return Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s)))).map(v=>v.toString(16).padStart(2,'0')).join('')}
 function validateName(n:unknown){if(typeof n!=='string'||!n.trim()||n.trim().length>16)throw Error('請輸入 1–16 個字的名字');return n.trim()}
-async function player(name:unknown,avatar:unknown,token:string):Promise<Player>{return {id:crypto.randomUUID(),secret:await hash(token),name:validateName(name),avatar:typeof avatar==='number'&&Number.isInteger(avatar)&&avatar>=0&&avatar<8?avatar:0,score:0,seen:Date.now(),left:false}}
+async function player(name:unknown,avatar:unknown,token:string):Promise<Player>{return {id:crypto.randomUUID(),secret:await hash(token),name:validateName(name),avatar:validAvatar(avatar)?avatar:0,score:0,seen:Date.now(),left:false}}
 function code(){const a=new Uint8Array(6);crypto.getRandomValues(a);return Array.from(a,x=>'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'[x%32]).join('')}
 async function handle(request:Request,body:any){const db=roomDb();const now=Date.now();
  if(body.action==='create'){
@@ -25,7 +26,9 @@ async function handle(request:Request,body:any){const db=roomDb();const now=Date
  const key=typeof body.requestId==='string'?p.id+':'+body.requestId:null;
  if(body.action!=='read'&&!joining&&!key)throw Error('操作缺少識別碼，請重試');
  if(!key||!r.actions.includes(key)){
- if(body.action==='start'){if(r.host!==p.id)throw Error('只有房主可以開始');if(r.phase==='playing')throw Error('請先完成這局');start(r,body.rows,body.cols,now)}
+ if(body.action==='start'){if(r.host!==p.id)throw Error('只有房主可以開始');if(r.phase==='playing')throw Error('請先完成這局');const setup=r.nextSetup??{deckSet:r.deckSet??'tabby',rows:body.rows,cols:body.cols};start(r,setup.rows,setup.cols,now);r.deckSet=setup.deckSet}
+ else if(body.action==='configure')configure(r,p.id,body.deckSet,body.rows,body.cols);
+ else if(body.action==='avatar'){if(!validAvatar(body.avatar))throw Error('頭像無效');p.avatar=body.avatar}
  else if(body.action==='flip'){if(body.deadline!==r.deadline||body.round!==r.round)throw Error('輪次已更新，請重新選牌');flip(r,p.id,body.index,now)}
  else if(body.action==='chat')sendChat(r,p,body.text,body.messageId,now);
  else if(body.action==='leave'){p.left=true;settle(r,now)}

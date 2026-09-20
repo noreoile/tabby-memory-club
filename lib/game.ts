@@ -1,7 +1,8 @@
-import {type DeckSet,resolveDeckSet} from './decks';
+import {type DeckSet,resolveDeckSet,isDeckSet} from './decks';
 export type Player={id:string;secret:string;name:string;avatar:number;score:number;seen:number;left:boolean};
 export type ChatMessage={id:string;playerId:string;name:string;avatar:number;text:string;sentAt:number};
-export type Room={deckSet?:DeckSet;messages?:ChatMessage[];code:string;players:Player[];host:string;rows:number;cols:number;deck:number[];matched:number[];flipped:number[];turn:string;phase:'lobby'|'playing'|'finished';resolveAt:number;deadline:number;round:number;last:string;actions:string[]};
+export type Room={nextSetup?:{deckSet:DeckSet;rows:number;cols:number};deckSet?:DeckSet;messages?:ChatMessage[];code:string;players:Player[];host:string;rows:number;cols:number;deck:number[];matched:number[];flipped:number[];turn:string;phase:'lobby'|'playing'|'finished';resolveAt:number;deadline:number;round:number;last:string;actions:string[]};
+export function configure(r:Room,pid:string,deckSet:unknown,rows:unknown,cols:unknown){if(r.host!==pid)throw Error('只有房主可以更換牌組與牌數');if(r.phase==='playing')throw Error('請等這局結束再更換');if(!isDeckSet(deckSet))throw Error('請選擇有效的牌組');if(typeof rows!=='number'||typeof cols!=='number'||!Number.isInteger(rows)||!Number.isInteger(cols)||rows<2||rows>8||cols<2||cols>8)throw Error('行列數需為 2–8');r.nextSetup={deckSet,rows,cols}}
 export function live(r:Room,now:number){return r.players.filter(p=>!p.left&&now-p.seen<45000)}
 export function next(r:Room,now:number){const online=live(r,now);const current=r.players.findIndex(p=>p.id===r.turn);for(let i=1;i<=r.players.length;i++){const p=r.players[(current+i)%r.players.length];if(online.some(o=>o.id===p.id)){r.turn=p.id;break}}r.deadline=now+35000}
 export function settle(r:Room,now:number){
