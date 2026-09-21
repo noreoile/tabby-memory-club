@@ -3,6 +3,8 @@ import {readFile} from 'node:fs/promises';
 import ts from 'typescript';
 const moduleUrl=source=>'data:text/javascript;base64,'+Buffer.from(ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.ESNext,target:ts.ScriptTarget.ES2022}}).outputText).toString('base64');
 const decks=moduleUrl(await readFile(new URL('../lib/decks.ts',import.meta.url),'utf8'));
+const {isDeckSet,resolveDeckSet}=await import(decks);
+assert.equal(isDeckSet('black'),true);assert.equal(resolveDeckSet('black'),'black');assert.equal(isDeckSet('gray'),false);
 const gameSource=(await readFile(new URL('../lib/game.ts',import.meta.url),'utf8')).replace("'./decks'",JSON.stringify(decks));
 const {flip,settle,view,start,next,sendReaction}=await import(moduleUrl(gameSource));
 const now=100000;

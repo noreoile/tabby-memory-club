@@ -5,9 +5,10 @@ export const DECKS = {
  otters: {name:'黑白貓', image:'/tuxedo-cats-v2.png', description:'黑臉白胸，從幼貓到年長貓', edition:'04',difficulty:'中等'},
  calico: {name:'三花貓', image:'/calico-cats-v1.png', description:'三色花紋，表情有點鬧', edition:'05',difficulty:'中等'},
  orange: {name:'橘貓', image:'/orange-cats-v1.png', description:'暖橘毛色，新的考驗', edition:'02',difficulty:'難'},
+ black: {name:'黑貓', image:'/black-cats-v1.png', description:'黑得很像，偶爾偷偷搞笑', edition:'06',difficulty:'難'},
 } as const;
 export type DeckSet = keyof typeof DECKS;
-export function isDeckSet(value:unknown):value is DeckSet {return value==='tabby'||value==='orange'||value==='abyssinian'||value==='otters'||value==='calico'}
+export function isDeckSet(value:unknown):value is DeckSet {return value==='tabby'||value==='orange'||value==='abyssinian'||value==='otters'||value==='calico'||value==='black'}
 export function resolveDeckSet(value:unknown):DeckSet {return isDeckSet(value)?value:'tabby'}
 // The reference-based sheet has unequal row heights; crop a square inside each
 // portrait so card faces and enlarged views never show the adjacent photo.
