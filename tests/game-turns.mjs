@@ -4,7 +4,7 @@ import ts from 'typescript';
 const moduleUrl=source=>'data:text/javascript;base64,'+Buffer.from(ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.ESNext,target:ts.ScriptTarget.ES2022}}).outputText).toString('base64');
 const decks=moduleUrl(await readFile(new URL('../lib/decks.ts',import.meta.url),'utf8'));
 const gameSource=(await readFile(new URL('../lib/game.ts',import.meta.url),'utf8')).replace("'./decks'",JSON.stringify(decks));
-const {flip,settle,view,start,sendReaction}=await import(moduleUrl(gameSource));
+const {flip,settle,view,start,next,sendReaction}=await import(moduleUrl(gameSource));
 const now=100000;
 function room(){return {code:'ABCDEF',players:[0,1,2].map(i=>({id:'p'+i,name:'Player '+i,secret:'secret',avatar:i,score:0,seen:now,left:false})),host:'p0',rows:2,cols:3,deck:[0,0,1,1,2,2],matched:[],flipped:[],turn:'p0',phase:'playing',resolveAt:0,deadline:now+35000,round:1,last:'',actions:[]}}
 function pair(r,a,b,t=now){flip(r,r.turn,a,t);flip(r,r.turn,b,t)}
@@ -18,4 +18,8 @@ r=room();pair(r,0,1,now+34900);settle(r,now+36600);assert.equal(r.turn,'p0');ass
 r=room();r.players[1].left=true;pair(r,0,2);settle(r,now+1700);assert.equal(r.turn,'p2');
 r=room();const watcher={id:'watcher',name:'Watcher',secret:'secret',avatar:4,score:0,seen:now,left:false,spectator:true};r.players.push(watcher);assert.throws(()=>flip(r,'watcher',0,now),/還沒輪到你/);r.turn='p2';pair(r,0,2);settle(r,now+1700);assert.equal(r.turn,'p0');start(r,2,2,now+1800);assert.equal(r.players.find(p=>p.id==='watcher').spectator,false);
 r=room();sendReaction(r,r.players[0],'reaction-1','reaction-1',now);assert.equal(r.reactions.at(-1).kind,'reaction-1');assert.throws(()=>sendReaction(r,r.players[0],'nope','reaction-2',now+800),/不支援/);assert.throws(()=>sendReaction(r,r.players[0],'reaction-2','reaction-3',now+500),/太快/);settle(r,now+9000);assert.deepEqual(r.reactions,[]);
-console.log('PASS turns, privacy, spectator promotion, reaction validation and expiry');
+r=room();r.rows=3;r.cols=3;r.deck=[0,1,2,3,-2,4,5,6,7];const beforeBomb=[...r.deck];flip(r,'p0',4,now);assert.equal(r.effects.at(-1).kind,'bomb');assert.equal(r.effects.at(-1).affected.length,4);assert.ok(r.matched.includes(4));assert.notDeepEqual(r.deck,beforeBomb);
+r=room();r.players[0].bananaPending=true;r.turn='p2';next(r,now+10);assert.equal(r.turn,'p0');assert.equal(r.flipped.length,1);assert.equal(r.effects.at(-1).kind,'banana');assert.equal(r.players[0].bananaPending,false);
+r=room();r.players[0].freezePending=true;r.turn='p2';next(r,now+10);assert.equal(r.turn,'p1');assert.equal(r.effects.at(-1).kind,'freeze');assert.equal(r.effects.at(-1).playerId,'p0');assert.equal(r.players[0].freezePending,false);
+r=room();start(r,3,3,now+1800,['bomb','banana','freeze']);assert.equal(r.deck.length,9);assert.equal(r.deck.filter(v=>v===-1).length,0);assert.equal(r.deck.filter(v=>v===-2).length,1);assert.equal(r.deck.filter(v=>v===-3).length,1);assert.equal(r.deck.filter(v=>v===-4).length,1);assert.equal(r.deck.filter(v=>v>=0).length,6);const hidden=view(r,'p0',1,now+1800).deck;assert.equal(hidden.filter(v=>v===null).length,9);
+console.log('PASS turns, privacy, spectator promotion, reactions and item cards');

@@ -27,6 +27,15 @@ Active games use adaptive polling: fast updates while a round is playing, slower
 
 People who join a room after a round has started enter as spectators. They can see the same safely projected board state, chat, and react, but they are excluded from the active turn order and cannot flip cards. All online spectators are promoted to players when the host starts the next round. The room remains capped at eight total members.
 
+## Item cards
+The host can optionally select one or more item-card types while creating a room or configuring the next round. One card of each selected type is shuffled into the fixed-size board; a rest tile is added when needed to leave an even number of cat cards. Item identities remain server-side until revealed.
+
+- Bomb: immediately consumes the turn and rotates the positions of up to four nearest unmatched cards.
+- Banana: immediately consumes the turn and automatically reveals one random cat card at the start of that player's next turn.
+- Freeze: immediately consumes the turn and skips that player's next turn.
+
+Item events are persisted with short-lived affected-card indexes so every client sees synchronized swap, automatic-flip, and frozen-player animations. The card art lives under `public/items/` and uses the three user-supplied images.
+
 ## Viewport layout
 Joined rooms fill the available viewport with independent board/chat scrolling. Desktop chat stays beside the board; narrow screens reserve a bottom chat area. Room configuration and results open in a dialog. The board fits the current row/column count, with an optional 110px minimum card zoom mode. Clicking a currently revealed card opens a larger image; concealment automatically closes it without pausing the turn. Verified at 1280×720 and 390×844 using a 6×7 board with eight players.
 
