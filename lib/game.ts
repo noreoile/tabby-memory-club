@@ -48,7 +48,7 @@ function beginTurn(r:Room,p:Player,now:number){
  const choices=r.deck.map((value,index)=>value>=0&&!r.matched.includes(index)?index:-1).filter(index=>index>=0);
  if(!choices.length)return;
  const index=choices[random(choices.length)];r.flipped=[index];
- addEffect(r,'banana',p.id,index,[index],now);r.last=`${p.name} 的香蕉卡自動翻開了一張牌！`;
+ addEffect(r,'banana',p.id,index,[index],now);r.last=`香蕉卡發動！系統已替 ${p.name} 隨機翻開一張貓咪牌，現在可以再選一張。`;
 }
 export function next(r:Room,now:number){
  const online=live(r,now);if(!online.length)return;
@@ -56,7 +56,7 @@ export function next(r:Room,now:number){
  for(let i=1;i<=r.players.length;i++){
   const p=r.players[(current+i)%r.players.length];
   if(!online.some(o=>o.id===p.id))continue;
-  if(p.freezePending){p.freezePending=false;addEffect(r,'freeze',p.id,-1,[],now);r.last=`${p.name} 被冰凍，跳過這回合！`;continue}
+  if(p.freezePending){p.freezePending=false;addEffect(r,'freeze',p.id,-1,[],now);r.last=`冰凍效果發動！${p.name} 這回合無法行動，已自動跳到下一位玩家。`;continue}
   beginTurn(r,p,now);return;
  }
  beginTurn(r,online[0],now);
@@ -100,9 +100,9 @@ function activateItem(r:Room,p:Player,kind:ItemCard,index:number,now:number){
  if(kind==='bomb'){
   affected=bombTargets(r,index);
   if(affected.length>1){const values=affected.map(target=>r.deck[target]),shift=random(affected.length-1)+1;affected.forEach((target,i)=>{r.deck[target]=values[(i+shift)%values.length]})}
-  r.last=`${p.name} 引爆炸彈，附近 ${affected.length} 張牌交換位置！`;
- }else if(kind==='banana'){p.bananaPending=true;r.last=`${p.name} 抽到香蕉卡，下次會自動翻開一張牌！`}
- else{p.freezePending=true;r.last=`${p.name} 抽到冰凍卡，下次回合會被跳過！`}
+  r.last=`炸彈卡啟動！${p.name} 附近的 ${affected.length} 張蓋牌正在交換位置，記住它們的新位置！`;
+ }else if(kind==='banana'){p.bananaPending=true;r.last=`香蕉卡已生效！${p.name} 下次輪到時，系統會先隨機翻開一張貓咪牌。`}
+ else{p.freezePending=true;r.last=`冰凍卡已生效！${p.name} 下次輪到時會被冰凍，並跳過一次行動。`}
  addEffect(r,kind,p.id,index,affected,now);r.resolveAt=now+2200;
 }
 export function flip(r:Room,pid:string,index:number,now:number){
