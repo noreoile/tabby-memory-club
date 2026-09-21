@@ -14,7 +14,7 @@ Use Node 22.13 or newer and npm. Run `npm run install:ci`, `npm run db:generate`
 Production migrations are shipped under `dist/.openai/drizzle`. The hosting configuration declares D1 binding `DB`.
 
 ## Assets
-`public/cats-v2.png` is a 6×6 sprite sheet of 36 generated tabby portraits. Original built-in imagegen output: 1254×1254 pixels (209×209 per portrait). Intended card display size is under 110px on desktop. Card image identities are not included in API responses until revealed or matched.
+Each cat deck uses a 6×6 sprite sheet of 36 portraits at 1254×1254 pixels (209×209 per portrait). The generated calico sheet is `public/calico-cats-v1.png`: realistic black, orange, and white cats with moderately distinct markings plus playful natural expressions for medium difficulty. Intended card display size is under 110px on desktop. Card image identities are not included in API responses until revealed or matched.
 
 ## Verification
 Validated strict turns, matching and scoring, odd/even board construction, full-round completion and replay, concurrent 8-player joins and capacity limits, session protection, hidden card projection, and idempotent actions. WebMCP read/flip tools were exercised in the browser, including invalid-input rejection.
@@ -41,4 +41,4 @@ Hosts can configure the next round in the same room from the main board surface.
 
 Run `node tests/game-turns.mjs` for turn logic. With the local server running, `node tests/room-config.integration.mjs` checks same-room deck changes, permissions, chat preservation, completed-round state and avatar validation.
 
-The former otter selection is now the black-and-white cat deck. The persisted `otters` identifier remains for existing-room compatibility. Its current asset, `tuxedo-cats-v2.png`, follows the user's coat-pattern reference: black face and nose, white chest bib, varied ages. Its difficulty is medium. Both selectors follow catalog order: Abyssinian (easy), tabby (medium), black-and-white (medium), orange (hard).
+The former otter selection is now the black-and-white cat deck. The persisted `otters` identifier remains for existing-room compatibility. Its current asset, `tuxedo-cats-v2.png`, follows the user's coat-pattern reference: black face and nose, white chest bib, varied ages. Its difficulty is medium. Both selectors follow catalog order: Abyssinian (easy), tabby (medium), black-and-white (medium), calico (medium), orange (hard).

@@ -3,10 +3,11 @@ export const DECKS = {
  tabby: {name:'狸花貓', image:'/cats-v2.png', description:'細緻虎斑，經典挑戰', edition:'01',difficulty:'中等'},
  // Keep the persisted slot ID so existing rooms and next-round selections remain valid.
  otters: {name:'黑白貓', image:'/tuxedo-cats-v2.png', description:'黑臉白胸，從幼貓到年長貓', edition:'04',difficulty:'中等'},
+ calico: {name:'三花貓', image:'/calico-cats-v1.png', description:'三色花紋，表情有點鬧', edition:'05',difficulty:'中等'},
  orange: {name:'橘貓', image:'/orange-cats-v1.png', description:'暖橘毛色，新的考驗', edition:'02',difficulty:'難'},
 } as const;
 export type DeckSet = keyof typeof DECKS;
-export function isDeckSet(value:unknown):value is DeckSet {return value==='tabby'||value==='orange'||value==='abyssinian'||value==='otters'}
+export function isDeckSet(value:unknown):value is DeckSet {return value==='tabby'||value==='orange'||value==='abyssinian'||value==='otters'||value==='calico'}
 export function resolveDeckSet(value:unknown):DeckSet {return isDeckSet(value)?value:'tabby'}
 // The reference-based sheet has unequal row heights; crop a square inside each
 // portrait so card faces and enlarged views never show the adjacent photo.
