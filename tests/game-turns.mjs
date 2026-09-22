@@ -6,7 +6,7 @@ const decks=moduleUrl(await readFile(new URL('../lib/decks.ts',import.meta.url),
 const {isDeckSet,resolveDeckSet}=await import(decks);
 assert.equal(isDeckSet('black'),true);assert.equal(resolveDeckSet('black'),'black');assert.equal(isDeckSet('gray'),false);
 const gameSource=(await readFile(new URL('../lib/game.ts',import.meta.url),'utf8')).replace("'./decks'",JSON.stringify(decks));
-const {flip,settle,view,start,next,sendReaction}=await import(moduleUrl(gameSource));
+const {flip,settle,view,start,next,sendReaction,REACTIONS}=await import(moduleUrl(gameSource));
 const now=100000;
 function room(){return {code:'ABCDEF',players:[0,1,2].map(i=>({id:'p'+i,name:'Player '+i,secret:'secret',avatar:i,score:0,seen:now,left:false})),host:'p0',rows:2,cols:3,deck:[0,0,1,1,2,2],matched:[],flipped:[],turn:'p0',phase:'playing',resolveAt:0,deadline:now+35000,round:1,last:'',actions:[]}}
 function pair(r,a,b,t=now){flip(r,r.turn,a,t);flip(r,r.turn,b,t)}
@@ -19,7 +19,7 @@ r=room();flip(r,'p0',0,now);settle(r,now+35000);assert.equal(r.turn,'p1');assert
 r=room();pair(r,0,1,now+34900);settle(r,now+36600);assert.equal(r.turn,'p0');assert.equal(r.deadline,now+71600);
 r=room();r.players[1].left=true;pair(r,0,2);settle(r,now+1700);assert.equal(r.turn,'p2');
 r=room();const watcher={id:'watcher',name:'Watcher',secret:'secret',avatar:4,score:0,seen:now,left:false,spectator:true};r.players.push(watcher);assert.throws(()=>flip(r,'watcher',0,now),/還沒輪到你/);r.turn='p2';pair(r,0,2);settle(r,now+1700);assert.equal(r.turn,'p0');start(r,2,2,now+1800);assert.equal(r.players.find(p=>p.id==='watcher').spectator,false);
-r=room();sendReaction(r,r.players[0],'reaction-1','reaction-1',now);assert.equal(r.reactions.at(-1).kind,'reaction-1');assert.throws(()=>sendReaction(r,r.players[0],'nope','reaction-2',now+800),/不支援/);assert.throws(()=>sendReaction(r,r.players[0],'reaction-2','reaction-3',now+500),/太快/);settle(r,now+9000);assert.deepEqual(r.reactions,[]);
+r=room();assert.equal(REACTIONS.length,16);sendReaction(r,r.players[0],'reaction-16','reaction-1',now);assert.equal(r.reactions.at(-1).kind,'reaction-16');assert.throws(()=>sendReaction(r,r.players[0],'nope','reaction-2',now+800),/不支援/);assert.throws(()=>sendReaction(r,r.players[0],'reaction-2','reaction-3',now+500),/太快/);settle(r,now+9000);assert.deepEqual(r.reactions,[]);
 r=room();r.rows=3;r.cols=3;r.deck=[0,1,2,3,-2,4,5,6,7];const beforeBomb=[...r.deck];flip(r,'p0',4,now);assert.equal(r.effects.at(-1).kind,'bomb');assert.equal(r.effects.at(-1).affected.length,4);assert.ok(r.matched.includes(4));assert.notDeepEqual(r.deck,beforeBomb);
 r=room();r.players[0].bananaPending=true;r.turn='p2';next(r,now+10);assert.equal(r.turn,'p0');assert.equal(r.flipped.length,1);assert.equal(r.effects.at(-1).kind,'banana');assert.equal(r.players[0].bananaPending,false);
 r=room();r.players[0].freezePending=true;r.turn='p2';next(r,now+10);assert.equal(r.turn,'p1');assert.equal(r.effects.at(-1).kind,'freeze');assert.equal(r.effects.at(-1).playerId,'p0');assert.equal(r.players[0].freezePending,false);

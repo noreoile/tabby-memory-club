@@ -1,6 +1,6 @@
 import {type DeckSet,resolveDeckSet,isDeckSet} from './decks';
 
-export const REACTIONS=Array.from({length:7},(_,index)=>({id:`reaction-${index+1}`,image:`/reactions/reaction-${index+1}.png`})) as readonly {id:string;image:string}[];
+export const REACTIONS=Array.from({length:16},(_,index)=>({id:`reaction-${index+1}`,image:`/reactions/reaction-${index+1}.png`})) as readonly {id:string;image:string}[];
 export const ITEM_CARDS={
  bomb:{name:'炸彈卡',image:'/items/bomb.png',description:'翻到後交換附近 4 張牌的位置',value:-2},
  banana:{name:'香蕉卡',image:'/items/banana.png',description:'下次輪到你時自動翻開 1 張牌',value:-3},
