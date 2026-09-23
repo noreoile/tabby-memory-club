@@ -19,6 +19,8 @@ const code=host.room.code,hostId=host.room.you;
 const guest=await game('join',null,{code,name:'Voice Guest',avatar:1});
 const guestId=guest.room.you;
 
+const passivePresence=await voice('GET',code,host.token);
+assert.equal(passivePresence.members.length,0,'checking voice presence must not join the microphone room');
 await voice('POST',code,host.token,{action:'join'});
 await voice('POST',code,guest.token,{action:'join'});
 const presence=await voice('GET',code,host.token);
