@@ -27,6 +27,11 @@ Active games use adaptive polling: fast updates while a round is playing, slower
 
 People who join a room after a round has started enter as spectators. They can see the same safely projected board state, chat, and react, but they are excluded from the active turn order and cannot flip cards. All online spectators are promoted to players when the host starts the next round. The room remains capped at eight total members.
 
+## Room voice chat
+Joined players and spectators can opt into room voice with one button, then mute, unmute, or leave independently. Audio is sent directly between browsers using a WebRTC mesh and is never recorded or stored by the app. D1 stores only short-lived authenticated voice presence and WebRTC offer/answer signaling; stale presence and signals are removed automatically. Player cards show who has joined voice and highlight the current speakers without covering the board.
+
+The initial connection uses Cloudflare's public STUN service. A TURN relay can be added later for networks whose corporate, campus, or carrier firewalls prevent direct peer connections.
+
 ## Item cards
 The host can optionally select one or more item-card types while creating a room or configuring the next round. One card of each selected type is shuffled into the fixed-size board; a rest tile is added when needed to leave an even number of cat cards. Item identities remain server-side until revealed.
 
@@ -48,6 +53,6 @@ Matching earns one point and another turn, with a fresh 35-second timer after re
 
 Hosts can configure the next round in the same room from the main board surface. `nextSetup` stores the next deck and grid separately, so completed cards and scores retain their original meaning until the next round begins. Configuration is host-only and blocked during play. Players and chat remain across rounds. A visible start button sits above the selectors. Difficulty labels: Abyssinian easy, tabby medium, orange hard, mixed river/sea otters medium. The new otter sheet contains 36 photographs, 18 of each kind. Avatars now offer 36 choices across three cat decks, with larger picker/preview/player portraits; original avatar IDs 0–7 still point to the same images.
 
-Run `node tests/game-turns.mjs` for turn logic. With the local server running, `node tests/room-config.integration.mjs` checks same-room deck changes, permissions, chat preservation, completed-round state and avatar validation.
+Run `node tests/game-turns.mjs` for turn logic. With the local server running, `node tests/room-config.integration.mjs` checks same-room deck changes, permissions, chat preservation, completed-round state and avatar validation. `node tests/voice.integration.mjs` validates authenticated voice presence, peer signaling, invalid-target rejection, and leave cleanup.
 
 The former otter selection is now the black-and-white cat deck. The persisted `otters` identifier remains for existing-room compatibility. Its current asset, `tuxedo-cats-v2.png`, follows the user's coat-pattern reference: black face and nose, white chest bib, varied ages. Its difficulty is medium. Both selectors follow catalog order: Abyssinian (easy), tabby (medium), black-and-white (medium), calico (medium), orange (hard), black cat (hard).

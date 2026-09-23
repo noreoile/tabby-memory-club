@@ -1,2 +1,4 @@
-import {sqliteTable,text,integer} from 'drizzle-orm/sqlite-core';
+import {sqliteTable,text,integer,primaryKey,index} from 'drizzle-orm/sqlite-core';
 export const rooms=sqliteTable('rooms',{code:text('code').primaryKey(),state:text('state').notNull(),version:integer('version').notNull().default(0),expiresAt:integer('expires_at').notNull()});
+export const voiceMembers=sqliteTable('voice_members',{roomCode:text('room_code').notNull(),playerId:text('player_id').notNull(),updatedAt:integer('updated_at').notNull()},table=>[primaryKey({columns:[table.roomCode,table.playerId]}),index('voice_members_room_updated').on(table.roomCode,table.updatedAt)]);
+export const voiceSignals=sqliteTable('voice_signals',{id:text('id').primaryKey(),roomCode:text('room_code').notNull(),senderId:text('sender_id').notNull(),targetId:text('target_id').notNull(),kind:text('kind').notNull(),payload:text('payload').notNull(),createdAt:integer('created_at').notNull()},table=>[index('voice_signals_target_created').on(table.roomCode,table.targetId,table.createdAt)]);

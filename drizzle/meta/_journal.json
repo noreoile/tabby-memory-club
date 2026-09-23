@@ -8,6 +8,13 @@
       "when": 1789785442144,
       "tag": "0000_curvy_inhumans",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1790142353762,
+      "tag": "0001_supreme_maggott",
+      "breakpoints": true
     }
   ]
 }
